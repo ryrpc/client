@@ -77,10 +77,10 @@ func (cl *Client) SetUserAgent(userAgent string) {
 	cl.SetCustomHeader("User-Agent", userAgent)
 }
 
-func (cl *Client) makeCallRequest(urlPath, method string, args interface{}) ([]byte, int, error) {
+func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int, error) {
 	req := fasthttp.AcquireRequest()
 	defer req.Reset()
-	req.SetRequestURI(cl.BaseURL + urlPath)
+	req.SetRequestURI(cl.BaseURL + "/" + method)
 
 	cl.SetCustomHeader("x-func", method)
 	for key, val := range cl.customHeaders {
@@ -117,7 +117,7 @@ func (cl *Client) makeCallRequest(urlPath, method string, args interface{}) ([]b
 
 	statusCode := resp.StatusCode()
 	if statusCode != 200 {
-		err = fmt.Errorf("rpc call %s() on %s status code: %d. could not decode body to rpc response: %s", method, urlPath, statusCode, err.Error())
+		err = fmt.Errorf("rpc call %s() status code: %d. could not decode body to rpc response: %s", method, statusCode, err.Error())
 		return nil, 0, err
 	}
 
@@ -125,15 +125,15 @@ func (cl *Client) makeCallRequest(urlPath, method string, args interface{}) ([]b
 }
 
 // Call run remote procedure on JSON-RPC 2.0 API with parsing answer to provided structure or interface
-func (cl *Client) Call(urlPath, method string, args interface{}) (SrvResponse, error) {
+func (cl *Client) Call(method string, args interface{}) (SrvResponse, error) {
 
 	var res SrvResponse
 
-	resp, statusCode, err := cl.makeCallRequest(urlPath, method, args)
+	resp, statusCode, err := cl.makeCallRequest(method, args)
 	if err != nil {
 		return res, err
 	}
-	res, err = decodeClientResponse(urlPath, method, resp, statusCode)
+	res, err = decodeClientResponse(method, resp, statusCode)
 	return res, err
 }
 

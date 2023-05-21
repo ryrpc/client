@@ -27,7 +27,7 @@ func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 }
 
 // decodeClientResponse decodes the response body of a client request into the interface reply.
-func decodeClientResponse(urlPath, method string, r []byte, statusCode int) (SrvResponse, error) {
+func decodeClientResponse(method string, r []byte, statusCode int) (SrvResponse, error) {
 
 	var res SrvResponse
 
@@ -37,7 +37,7 @@ func decodeClientResponse(urlPath, method string, r []byte, statusCode int) (Srv
 	err := decoder.Decode(&res)
 
 	if err != nil {
-		err := fmt.Errorf("rpc call %s() on %s. could not decode body to rpc response: %s", method, urlPath, err.Error())
+		err := fmt.Errorf("rpc call %s() on could not decode body to rpc response: %s", method, err.Error())
 		return res, err
 	}
 
