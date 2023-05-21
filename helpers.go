@@ -8,6 +8,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/bytedance/sonic/decoder"
+	"github.com/valyala/fastjson"
 )
 
 // func printObject(v interface{}) string {
@@ -27,19 +28,35 @@ func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 }
 
 // decodeClientResponse decodes the response body of a client request into the interface reply.
-func decodeClientResponse(method string, r []byte, statusCode int) (SrvResponse, error) {
+func decodeClientResponse(method string, r []byte, result interface{}) error {
 
-	var res SrvResponse
-
-	decoder := decoder.NewDecoder(string(r))
-	decoder.DisallowUnknownFields()
-	decoder.UseNumber()
-	err := decoder.Decode(&res)
-
+	val, err := fastjson.ParseBytes(r)
 	if err != nil {
-		err := fmt.Errorf("rpc call %s() on could not decode body to rpc response: %s", method, err.Error())
-		return res, err
+		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc response: %s", method, err.Error())
+		return err1
 	}
 
-	return res, nil
+	if val.Exists("error") {
+		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc response: %s", method, string(val.GetStringBytes("error")))
+		return err1
+	}
+
+	if !val.Exists("result") {
+		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc response: not found", method)
+		return err1
+	}
+
+	ss := string(val.GetStringBytes("result"))
+
+	decoder := decoder.NewDecoder(ss)
+	decoder.DisallowUnknownFields()
+	decoder.UseNumber()
+	err = decoder.Decode(result)
+
+	if err != nil {
+		err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc response: %s", method, err.Error())
+		return err1
+	}
+
+	return nil
 }

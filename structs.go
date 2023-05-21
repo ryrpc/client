@@ -23,12 +23,6 @@ type Client struct {
 	clientPool                    *sync.Pool
 }
 
-type SrvResponse struct {
-	JSONRPC string      `json:"jsonrpc"`
-	Result  interface{} `json:"result,omitempty"`
-	ID      uint64      `json:"id"`
-}
-
 // clientRequest represents a JSON-RPC request sent by a client.
 type clientRequest struct {
 	// JSON-RPC protocol.

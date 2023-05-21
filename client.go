@@ -125,16 +125,14 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 }
 
 // Call run remote procedure on JSON-RPC 2.0 API with parsing answer to provided structure or interface
-func (cl *Client) Call(method string, args interface{}) (SrvResponse, error) {
+func (cl *Client) Call(method string, args, result interface{}) error {
 
-	var res SrvResponse
-
-	resp, statusCode, err := cl.makeCallRequest(method, args)
+	resp, _, err := cl.makeCallRequest(method, args)
 	if err != nil {
-		return res, err
+		return err
 	}
-	res, err = decodeClientResponse(method, resp, statusCode)
-	return res, err
+	err = decodeClientResponse(method, resp, result)
+	return err
 }
 
 /*

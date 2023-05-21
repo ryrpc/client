@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/bytedance/sonic v1.8.8
 	github.com/valyala/fasthttp v1.47.0
+	github.com/valyala/fastjson v1.6.4
 	lukechampine.com/frand v1.4.2
 )
 
