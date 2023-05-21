@@ -23,16 +23,9 @@ type Client struct {
 	clientPool                    *sync.Pool
 }
 
-type RPCError struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
-}
-
 type SrvResponse struct {
 	JSONRPC string      `json:"jsonrpc"`
 	Result  interface{} `json:"result,omitempty"`
-	Error   *RPCError   `json:"error,omitempty"`
 	ID      uint64      `json:"id"`
 }
 
