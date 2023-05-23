@@ -128,6 +128,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 func (cl *Client) Call(method string, args, result interface{}) error {
 
 	resp, _, err := cl.makeCallRequest(method, args)
+	fmt.Println("Call = ", string(resp))
 	if err != nil {
 		return err
 	}
