@@ -82,7 +82,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 	defer req.Reset()
 	req.SetRequestURI(cl.BaseURL + "/" + method)
 
-	cl.SetCustomHeader("x-func", method)
+	cl.SetCustomHeader("X-Func", method)
 	for key, val := range cl.customHeaders {
 		req.Header.Set(key, val)
 	}
@@ -128,7 +128,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 func (cl *Client) Call(method string, args, result interface{}) error {
 
 	resp, _, err := cl.makeCallRequest(method, args)
-	fmt.Println("Call = ", string(resp))
+	//fmt.Println("Call = ", string(resp))
 	if err != nil {
 		return err
 	}
