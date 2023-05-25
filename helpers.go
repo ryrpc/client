@@ -47,7 +47,7 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 	}
 
 	
-	b := val.GetStringBytes("result")
+	b := val.Get("result").MarshalTo(nil)
 	err = sonic.Unmarshal(b, result)
 	/*
 	ss := string(val.GetStringBytes("result"))
