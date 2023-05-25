@@ -32,12 +32,12 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 
 	val, err := fastjson.ParseBytes(r)
 	if err != nil {
-		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc response: %s", method, err.Error())
+		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc ParseBytes: %s", method, err.Error())
 		return err1
 	}
 
 	if val.Exists("error") {
-		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc response: %s", method, string(val.GetStringBytes("error")))
+		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc error: %s", method, string(val.GetStringBytes("error")))
 		return err1
 	}
 
@@ -54,7 +54,7 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 	err = decoder.Decode(result)
 
 	if err != nil {
-		err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc response: %s", method, err.Error())
+		err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc Decode: %s", method, err.Error())
 		return err1
 	}
 
