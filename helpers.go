@@ -7,7 +7,7 @@ import (
 	"lukechampine.com/frand"
 
 	"github.com/bytedance/sonic"
-	"github.com/bytedance/sonic/decoder"
+	//"github.com/bytedance/sonic/decoder"
 	"github.com/valyala/fastjson"
 )
 
@@ -46,13 +46,16 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 		return err1
 	}
 
+	
+	b := val.GetStringBytes("result")
+	err = sonic.Unmarshal(b, result)
+	/*
 	ss := string(val.GetStringBytes("result"))
-
 	decoder := decoder.NewDecoder(ss)
 	decoder.DisallowUnknownFields()
 	decoder.UseNumber()
 	err = decoder.Decode(result)
-
+	*/
 	if err != nil {
 		err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc Decode: %s", method, err.Error())
 		return err1
