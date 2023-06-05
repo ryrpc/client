@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/bytedance/sonic v1.8.8
+	github.com/fxamacker/cbor/v2 v2.4.0
 	github.com/valyala/fasthttp v1.47.0
 	github.com/valyala/fastjson v1.6.4
 	lukechampine.com/frand v1.4.2
@@ -17,6 +18,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 )
