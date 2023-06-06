@@ -80,7 +80,7 @@ func (cl *Client) SetUserAgent(userAgent string) {
 func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int, error) {
 	req := fasthttp.AcquireRequest()
 	defer req.Reset()
-	req.SetRequestURI(cl.BaseURL + "/" + method)
+	req.SetRequestURI(cl.BaseURL + method)
 
 	cl.SetCustomHeader("X-Func", method)
 	for key, val := range cl.customHeaders {
