@@ -11,7 +11,7 @@ type ErrorCode int
 
 const (
 	userAgent          = "ryrpc-client"
-	defaultContentType = "application/json"
+	defaultContentType = "application/x-www-form-urlencoded"
 )
 
 // Client basic struct that contains all method to work with JSON-RPC 2.0 protocol
