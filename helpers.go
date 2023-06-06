@@ -18,17 +18,21 @@ import (
 // encodeClientRequest encodes parameters for a JSON-RPC client request.
 func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 
-	b, err := cbor.Marshal(args)
-	if err != nil {
-		return b, err
-	}
-
 	arg := &fasthttp.Args{}
 
 	arg.Add("version", "2.0")
 	arg.Add("method", method)
 	arg.Add("id", fmt.Sprintf("%d", frand.Uint64n(math.MaxUint64)))
-	arg.AddBytesV("params", b)
+
+	if val, ok := args.(string); ok {
+		arg.Add("params", val)
+	} else {
+		b, err := cbor.Marshal(args)
+		if err != nil {
+			return b, err
+		}
+		arg.AddBytesV("params", b)
+	}
 
 	qs := arg.QueryString()
 
