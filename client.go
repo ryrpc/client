@@ -82,7 +82,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 	defer req.Reset()
 	req.SetRequestURI(cl.BaseURL + method)
 
-	cl.SetCustomHeader("X-Func", method)
+	cl.SetCustomHeader("X-Func-Name", method)
 	for key, val := range cl.customHeaders {
 		req.Header.Set(key, val)
 	}
