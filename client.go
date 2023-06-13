@@ -117,7 +117,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 
 	statusCode := resp.StatusCode()
 	if statusCode != 200 {
-		err = fmt.Errorf("rpc call %s() status code: %d. could not decode body to rpc response: %s", method, statusCode, err.Error())
+		err = fmt.Errorf("rpc call %s() status code: %d.", method, statusCode)
 		return nil, 0, err
 	}
 
