@@ -18,7 +18,8 @@ import (
 // encodeClientRequest encodes parameters for a JSON-RPC client request.
 func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 
-	arg := &fasthttp.Args{}
+	arg := fasthttp.AcquireArgs()
+	defer fasthttp.ReleaseArgs(arg)
 
 	arg.Add("version", "2.0")
 	arg.Add("method", method)
@@ -42,22 +43,24 @@ func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 // decodeClientResponse decodes the response body of a client request into the interface reply.
 func decodeClientResponse(method string, r []byte, result interface{}) error {
 
-	arg := &fasthttp.Args{}
+	arg := Base{}
 
-	arg.ParseBytes(r)
-
-	if arg.Has("error") {
-		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc error: %s", method, string(arg.Peek("error")))
-		return err1
+	_, err := arg.Unmarshal(r)
+	if err != nil {
+		return err
 	}
 
-	if !arg.Has("result") {
-		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc response: not found", method)
+	if len(arg.Err) > 0 {
+		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc error: %s", method, arg.Err)
 		return err1
 	}
-
-	b := arg.Peek("result")
-	err := cbor.Unmarshal(b, result)
+	/*
+		if !arg.Has("result") {
+			err1 := fmt.Errorf("rpc call %s on could not decode body to rpc response: not found", method)
+			return err1
+		}
+	*/
+	err = cbor.Unmarshal(arg.Data, result)
 	if err != nil {
 		err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc Decode: %s", method, err.Error())
 		return err1
