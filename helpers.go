@@ -50,8 +50,8 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 		return err
 	}
 
-	if len(arg.Err) > 0 {
-		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc error: %s", method, arg.Err)
+	if len(arg.GetErr()) > 0 {
+		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc error: %s", method, arg.GetErr())
 		return err1
 	}
 	/*
@@ -60,7 +60,7 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 			return err1
 		}
 	*/
-	err = cbor.Unmarshal(arg.Data, result)
+	err = cbor.Unmarshal(arg.GetData(), result)
 	if err != nil {
 		err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc Decode: %s", method, err.Error())
 		return err1
