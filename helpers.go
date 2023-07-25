@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math"
 
-	"lukechampine.com/frand"
-
 	"github.com/fxamacker/cbor/v2"
+	"github.com/golang/protobuf/proto"
 	"github.com/valyala/fasthttp"
+	"lukechampine.com/frand"
 )
 
 // func printObject(v interface{}) string {
@@ -43,9 +43,9 @@ func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 // decodeClientResponse decodes the response body of a client request into the interface reply.
 func decodeClientResponse(method string, r []byte, result interface{}) error {
 
-	arg := Base{}
+	arg := &Base{}
 
-	_, err := arg.Unmarshal(r)
+	err := proto.Unmarshal(r, arg)
 	if err != nil {
 		return err
 	}
