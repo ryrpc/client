@@ -60,7 +60,7 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 			return err1
 		}
 	*/
-	if _, ok := result.(string); ok {
+	if _, ok := result.(*string); ok {
 		result = string(arg.GetData())
 	} else {
 		err = cbor.Unmarshal(arg.GetData(), result)
