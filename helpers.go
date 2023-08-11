@@ -60,10 +60,14 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 			return err1
 		}
 	*/
-	err = cbor.Unmarshal(arg.GetData(), result)
-	if err != nil {
-		err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc Decode: %s", method, err.Error())
-		return err1
+	if _, ok := result.(string); ok {
+		result = string(arg.GetData())
+	} else {
+		err = cbor.Unmarshal(arg.GetData(), result)
+		if err != nil {
+			err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc Decode: %s", method, err.Error())
+			return err1
+		}
 	}
 
 	return nil
