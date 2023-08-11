@@ -51,7 +51,7 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 	}
 
 	if len(arg.GetErr()) > 0 {
-		err1 := fmt.Errorf("rpc call %s on could not decode body to rpc error: %s", method, arg.GetErr())
+		err1 := fmt.Errorf("rpc call %s on rpc error: %s", method, arg.GetErr())
 		return err1
 	}
 	/*
