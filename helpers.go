@@ -62,6 +62,8 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 	*/
 	if vv, ok := result.(*string); ok {
 		*vv = string(arg.GetData())
+	} else if vv, ok := result.(*[]byte); ok {
+		*vv = arg.GetData()
 	} else {
 		err = cbor.Unmarshal(arg.GetData(), result)
 		if err != nil {
