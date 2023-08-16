@@ -2,12 +2,9 @@ package rycli
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/golang/protobuf/proto"
-	"github.com/valyala/fasthttp"
-	"lukechampine.com/frand"
 )
 
 // func printObject(v interface{}) string {
