@@ -80,9 +80,14 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 	req := fasthttp.AcquireRequest()
 	defer req.Reset()
 	req.SetRequestURI(cl.BaseURL + method)
-	/*
+
 	name := strings.SplitN(method, "/", 3)
-	cl.SetCustomHeader("X-Func-Name", name[1])
+	if len(name) > 1 {
+		cl.SetCustomHeader("X-Func-Name", name[1])	
+	}
+	
+	
+	/*
 	for key, val := range cl.customHeaders {
 		req.Header.Set(key, val)
 	}
