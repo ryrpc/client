@@ -2,8 +2,9 @@ package rycli
 
 import (
 	"encoding/json"
-	"sync"
 	"time"
+
+	"github.com/valyala/fasthttp"
 )
 
 // ErrorCode type for error codes
@@ -20,7 +21,7 @@ type Client struct {
 	BaseURL                       string
 	clientTimeout                 time.Duration
 	customHeaders                 map[string]string
-	clientPool                    *sync.Pool
+	clientPool                    *fasthttp.Client
 }
 
 // clientRequest represents a JSON-RPC request sent by a client.

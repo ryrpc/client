@@ -3,9 +3,12 @@ package rycli
 import (
 	"encoding/base64"
 	"fmt"
-	"sync"
 	"time"
+<<<<<<< Updated upstream
 	"strings"
+=======
+
+>>>>>>> Stashed changes
 	"github.com/valyala/fasthttp"
 )
 
@@ -18,11 +21,7 @@ func getDefaultHeadersMap() map[string]string {
 
 func createNewClient() *Client {
 	return &Client{
-		clientPool: &sync.Pool{
-			New: func() interface{} {
-				return new(fasthttp.Client)
-			},
-		},
+		clientPool:    &fasthttp.Client{},
 		customHeaders: getDefaultHeadersMap(),
 	}
 }
@@ -91,13 +90,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 		}
 	}
 	
-	
-	/*
-	for key, val := range cl.customHeaders {
-		req.Header.Set(key, val)
-	}
-	*/
-	
+
 	req.Header.SetMethod("POST")
 	byteBody, err := encodeClientRequest(method, args)
 	if err != nil {
@@ -110,21 +103,17 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 	resp := fasthttp.AcquireResponse()
 	defer resp.Reset()
 
-	client := cl.clientPool.Get().(*fasthttp.Client)
-
-	client.DisableHeaderNamesNormalizing = cl.disableHeaderNamesNormalizing
+	cl.clientPool.DisableHeaderNamesNormalizing = cl.disableHeaderNamesNormalizing
 
 	if cl.clientTimeout == 0 {
-		if err := client.Do(req, resp); err != nil {
+		if err := cl.clientPool.Do(req, resp); err != nil {
 			return nil, 0, err
 		}
 	} else {
-		if err := client.DoTimeout(req, resp, cl.clientTimeout); err != nil {
+		if err := cl.clientPool.DoTimeout(req, resp, cl.clientTimeout); err != nil {
 			return nil, 0, err
 		}
 	}
-
-	cl.clientPool.Put(client)
 
 	statusCode := resp.StatusCode()
 	if statusCode != 200 {
