@@ -4,11 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"time"
-<<<<<<< Updated upstream
 	"strings"
-=======
-
->>>>>>> Stashed changes
 	"github.com/valyala/fasthttp"
 )
 
