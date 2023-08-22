@@ -3,8 +3,9 @@ package rycli
 import (
 	"encoding/base64"
 	"fmt"
-	"time"
 	"strings"
+	"time"
+
 	"github.com/valyala/fasthttp"
 )
 
@@ -80,12 +81,11 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 	name := strings.SplitN(method, "/", 5)
 	if len(name) > 1 {
 
-		cl.SetCustomHeader("func", name[1])
+		req.Header.Set("func", name[1])
 		for key, val := range cl.customHeaders {
 			req.Header.Set(key, val)
 		}
 	}
-	
 
 	req.Header.SetMethod("POST")
 	byteBody, err := encodeClientRequest(method, args)
