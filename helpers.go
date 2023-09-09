@@ -37,8 +37,8 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 	}
 
 	if len(arg.GetErr()) > 0 {
-		err1 := fmt.Errorf("rpc call %s on rpc error: %s", method, arg.GetErr())
-		return err1
+		//err1 := fmt.Errorf("rpc call %s on rpc error: %s", method, arg.GetErr())
+		return errors.New(arg.GetErr())
 	}
 	/*
 		if !arg.Has("result") {
