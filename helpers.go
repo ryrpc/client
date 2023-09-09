@@ -2,7 +2,7 @@ package rycli
 
 import (
 	"fmt"
-
+	"errors"
 	"github.com/fxamacker/cbor/v2"
 	"github.com/golang/protobuf/proto"
 )
