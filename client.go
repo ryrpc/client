@@ -9,17 +9,10 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func getDefaultHeadersMap() map[string]string {
-	headers := make(map[string]string)
-	headers["User-Agent"] = userAgent
-	headers["Content-Type"] = defaultContentType
-	return headers
-}
-
 func createNewClient() *Client {
 	return &Client{
-		clientPool:    &fasthttp.Client{},
-		customHeaders: getDefaultHeadersMap(),
+		clientPool: &fasthttp.Client{},
+		//customHeaders: getDefaultHeadersMap(),
 	}
 }
 
@@ -44,15 +37,18 @@ func (cl *Client) SetClientTimeout(duration time.Duration) {
 }
 
 // SetCustomHeader setting custom header
-func (cl *Client) SetCustomHeader(headerName string, headerValue string) {
-	cl.customHeaders[headerName] = headerValue
+func (cl *Client) SetCustomHeader(headerName, headerValue string) {
+
+	cl.customHeaders.Store(headerName, headerValue)
+	//cl.customHeaders[headerName] = headerValue
 }
 
+/*
 // DeleteCustomHeader delete custom header
 func (cl *Client) DeleteCustomHeader(headerName string) {
 	delete(cl.customHeaders, headerName)
 }
-
+*/
 // SetBasicAuthHeader setting basic auth header
 func (cl *Client) SetBasicAuthHeader(login string, password string) {
 	cl.SetCustomAuthHeader("Basic", base64.StdEncoding.EncodeToString([]byte(login+":"+password)))
@@ -63,28 +59,32 @@ func (cl *Client) SetCustomAuthHeader(authType string, authData string) {
 	cl.SetCustomHeader("Authorization", authType+" "+authData)
 }
 
+/*
 // DeleteAuthHeader clear basic auth header
 func (cl *Client) DeleteAuthHeader() {
 	cl.DeleteCustomHeader("Authorization")
 }
-
-// SetUserAgent setting custom User Agent header
-func (cl *Client) SetUserAgent(userAgent string) {
-	cl.SetCustomHeader("User-Agent", userAgent)
-}
+*/
 
 func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int, error) {
 	req := fasthttp.AcquireRequest()
 	defer req.Reset()
 	req.SetRequestURI(cl.BaseURL + method)
 
+	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("Content-Type", defaultContentType)
+
 	name := strings.SplitN(method, "/", 5)
 	if len(name) > 1 {
 
 		req.Header.Set("func", name[1])
-		for key, val := range cl.customHeaders {
-			req.Header.Set(key, val)
-		}
+
+		cl.customHeaders.Range(func(k, v interface{}) bool {
+			//fmt.Println("range (): ", v)
+			req.Header.Set(k.(string), v.(string))
+			return true
+		})
+
 	}
 
 	req.Header.SetMethod("POST")

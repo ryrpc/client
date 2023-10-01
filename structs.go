@@ -2,6 +2,7 @@ package rycli
 
 import (
 	"encoding/json"
+	sync "sync"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -20,7 +21,7 @@ type Client struct {
 	disableHeaderNamesNormalizing bool
 	BaseURL                       string
 	clientTimeout                 time.Duration
-	customHeaders                 map[string]string
+	customHeaders                 sync.Map
 	clientPool                    *fasthttp.Client
 }
 
