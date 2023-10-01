@@ -82,6 +82,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 		cl.customHeaders.Range(func(k, v interface{}) bool {
 			//fmt.Println("range (): ", v)
 			req.Header.Set(k.(string), v.(string))
+			cl.customHeaders.Delete(k)
 			return true
 		})
 
