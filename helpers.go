@@ -1,8 +1,9 @@
 package rycli
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
+
 	"github.com/fxamacker/cbor/v2"
 	"github.com/golang/protobuf/proto"
 )
@@ -29,7 +30,7 @@ func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 // decodeClientResponse decodes the response body of a client request into the interface reply.
 func decodeClientResponse(method string, r []byte, result interface{}) error {
 
-	arg := &Base{}
+	arg := &PBase{}
 
 	err := proto.Unmarshal(r, arg)
 	if err != nil {
