@@ -18,6 +18,8 @@ func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 
 	if val, ok := args.(string); ok {
 		return []byte(val), nil
+	} else if val, ok := args.([]byte); ok {
+		return val, nil
 	} else {
 		b, err := cbor.Marshal(args)
 		if err != nil {
