@@ -85,6 +85,10 @@ func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args
 		}
 	}
 
+		req.Header.VisitAll(func(key, value []byte) {
+		fmt.Println("req.Header key: ", string(key), " value: ", string(value))
+	})
+	
 	cl.clientPool.Put(cli)
 	statusCode := resp.StatusCode()
 	if statusCode != 200 {
@@ -92,9 +96,6 @@ func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args
 		return nil, 0, err
 	}
 
-	req.Header.VisitAll(func(key, value []byte) {
-		fmt.Println("req.Header key: ", string(key), " value: ", string(value))
-	})
 	return resp.SwapBody(nil), statusCode, nil
 }
 
