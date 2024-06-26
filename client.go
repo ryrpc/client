@@ -106,14 +106,17 @@ func (cl *Client) makeCallRequest(method string, args interface{}, headers map[s
 
 	if cl.clientTimeout == 0 {
 		if err := cli.Do(req, resp); err != nil {
+			cl.clientPool.Put(cli)
 			return nil, 0, err
 		}
 	} else {
 		if err := cli.DoTimeout(req, resp, cl.clientTimeout); err != nil {
+			cl.clientPool.Put(cli)
 			return nil, 0, err
 		}
 	}
-
+	
+	cl.clientPool.Put(cli)
 	statusCode := resp.StatusCode()
 	if statusCode != 200 {
 		err = fmt.Errorf("rpc call %s() status code: %d.", method, statusCode)
