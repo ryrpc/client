@@ -41,38 +41,7 @@ func (cl *Client) SetClientTimeout(duration time.Duration) {
 	cl.clientTimeout = duration
 }
 
-/*
-// SetCustomHeader setting custom header
-func (cl *Client) SetCustomHeader(headerName, headerValue string) {
-
-	cl.customHeaders.Store(headerName, headerValue)
-	//cl.customHeaders[headerName] = headerValue
-}
-
-
-// DeleteCustomHeader delete custom header
-func (cl *Client) DeleteCustomHeader(headerName string) {
-	delete(cl.customHeaders, headerName)
-}
-
-// SetBasicAuthHeader setting basic auth header
-func (cl *Client) SetBasicAuthHeader(login string, password string) {
-	cl.SetCustomAuthHeader("Basic", base64.StdEncoding.EncodeToString([]byte(login+":"+password)))
-}
-
-// SetCustomAuthHeader setting custom auth header with type of auth and auth data
-func (cl *Client) SetCustomAuthHeader(authType string, authData string) {
-	cl.SetCustomHeader("Authorization", authType+" "+authData)
-}
-*/
-/*
-// DeleteAuthHeader clear basic auth header
-func (cl *Client) DeleteAuthHeader() {
-	cl.DeleteCustomHeader("Authorization")
-}
-*/
-
-func (cl *Client) makeCallRequest(method string, args interface{}, headers map[string]string) ([]byte, int, error) {
+func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args interface{}) ([]byte, int, error) {
 	req := fasthttp.AcquireRequest()
 	defer req.Reset()
 	req.SetRequestURI(cl.BaseURL + method)
@@ -83,11 +52,11 @@ func (cl *Client) makeCallRequest(method string, args interface{}, headers map[s
 	name := strings.SplitN(method, "/", 5)
 	if len(name) > 1 {
 
+		fctx.Request.Header.Del("Host")
+		fctx.Request.Header.Del("User-Agent")
+		fctx.Request.Header.Del("Content-Type")
+		fctx.Request.Header.CopyTo(&req.Header)
 		req.Header.Set("func", name[1])
-
-		for k, v := range headers {
-			req.Header.Set(k, v)
-		}
 	}
 
 	req.Header.SetMethod("POST")
@@ -115,7 +84,7 @@ func (cl *Client) makeCallRequest(method string, args interface{}, headers map[s
 			return nil, 0, err
 		}
 	}
-	
+
 	cl.clientPool.Put(cli)
 	statusCode := resp.StatusCode()
 	if statusCode != 200 {
@@ -123,13 +92,16 @@ func (cl *Client) makeCallRequest(method string, args interface{}, headers map[s
 		return nil, 0, err
 	}
 
+	req.Header.VisitAll(func(key, value []byte) {
+		fmt.Println("req.Header key: ", string(key), " value: ", string(value))
+	})
 	return resp.SwapBody(nil), statusCode, nil
 }
 
 // Call run remote procedure on JSON-RPC 2.0 API with parsing answer to provided structure or interface
-func (cl *Client) Call(method string, headers map[string]string, args, result interface{}) error {
+func (cl *Client) Call(fctx *fasthttp.RequestCtx, method string, args, result interface{}) error {
 
-	resp, _, err := cl.makeCallRequest(method, args, headers)
+	resp, _, err := cl.makeCallRequest(fctx, method, args)
 	//fmt.Println("Call = ", string(resp))
 	if err != nil {
 		return err
