@@ -1,9 +1,9 @@
 package rycli
 
 import (
-	"encoding/base64"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/valyala/fasthttp"
@@ -11,7 +11,12 @@ import (
 
 func createNewClient() *Client {
 	return &Client{
-		clientPool: &fasthttp.Client{},
+		clientTimeout: 12 * time.Second,
+		clientPool: &sync.Pool{
+			New: func() interface{} {
+				return new(fasthttp.Client)
+			},
+		},
 		//customHeaders: getDefaultHeadersMap(),
 	}
 }
@@ -36,6 +41,7 @@ func (cl *Client) SetClientTimeout(duration time.Duration) {
 	cl.clientTimeout = duration
 }
 
+/*
 // SetCustomHeader setting custom header
 func (cl *Client) SetCustomHeader(headerName, headerValue string) {
 
@@ -43,12 +49,12 @@ func (cl *Client) SetCustomHeader(headerName, headerValue string) {
 	//cl.customHeaders[headerName] = headerValue
 }
 
-/*
+
 // DeleteCustomHeader delete custom header
 func (cl *Client) DeleteCustomHeader(headerName string) {
 	delete(cl.customHeaders, headerName)
 }
-*/
+
 // SetBasicAuthHeader setting basic auth header
 func (cl *Client) SetBasicAuthHeader(login string, password string) {
 	cl.SetCustomAuthHeader("Basic", base64.StdEncoding.EncodeToString([]byte(login+":"+password)))
@@ -58,7 +64,7 @@ func (cl *Client) SetBasicAuthHeader(login string, password string) {
 func (cl *Client) SetCustomAuthHeader(authType string, authData string) {
 	cl.SetCustomHeader("Authorization", authType+" "+authData)
 }
-
+*/
 /*
 // DeleteAuthHeader clear basic auth header
 func (cl *Client) DeleteAuthHeader() {
@@ -66,7 +72,7 @@ func (cl *Client) DeleteAuthHeader() {
 }
 */
 
-func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int, error) {
+func (cl *Client) makeCallRequest(method string, args interface{}, headers map[string]string) ([]byte, int, error) {
 	req := fasthttp.AcquireRequest()
 	defer req.Reset()
 	req.SetRequestURI(cl.BaseURL + method)
@@ -79,13 +85,9 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 
 		req.Header.Set("func", name[1])
 
-		cl.customHeaders.Range(func(k, v interface{}) bool {
-			//fmt.Println("range (): ", v)
-			req.Header.Set(k.(string), v.(string))
-			cl.customHeaders.Delete(k)
-			return true
-		})
-
+		for k, v := range headers {
+			req.Header.Set(k, v)
+		}
 	}
 
 	req.Header.SetMethod("POST")
@@ -100,14 +102,14 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 	resp := fasthttp.AcquireResponse()
 	defer resp.Reset()
 
-	cl.clientPool.DisableHeaderNamesNormalizing = cl.disableHeaderNamesNormalizing
+	cli := cl.clientPool.Get().(*fasthttp.Client)
 
 	if cl.clientTimeout == 0 {
-		if err := cl.clientPool.Do(req, resp); err != nil {
+		if err := cli.Do(req, resp); err != nil {
 			return nil, 0, err
 		}
 	} else {
-		if err := cl.clientPool.DoTimeout(req, resp, cl.clientTimeout); err != nil {
+		if err := cli.DoTimeout(req, resp, cl.clientTimeout); err != nil {
 			return nil, 0, err
 		}
 	}
@@ -122,9 +124,9 @@ func (cl *Client) makeCallRequest(method string, args interface{}) ([]byte, int,
 }
 
 // Call run remote procedure on JSON-RPC 2.0 API with parsing answer to provided structure or interface
-func (cl *Client) Call(method string, args, result interface{}) error {
+func (cl *Client) Call(method string, headers map[string]string, args, result interface{}) error {
 
-	resp, _, err := cl.makeCallRequest(method, args)
+	resp, _, err := cl.makeCallRequest(method, args, headers)
 	//fmt.Println("Call = ", string(resp))
 	if err != nil {
 		return err
