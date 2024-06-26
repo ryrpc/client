@@ -44,10 +44,6 @@ func (cl *Client) SetClientTimeout(duration time.Duration) {
 func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args interface{}) ([]byte, int, error) {
 	req := fasthttp.AcquireRequest()
 	defer req.Reset()
-	req.SetRequestURI(cl.BaseURL + method)
-
-	req.Header.Set("User-Agent", userAgent)
-	req.Header.Set("Content-Type", defaultContentType)
 
 	name := strings.SplitN(method, "/", 5)
 	if len(name) > 1 {
@@ -58,7 +54,10 @@ func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args
 		fctx.Request.Header.CopyTo(&req.Header)
 		req.Header.Set("func", name[1])
 	}
-
+	
+	req.SetRequestURI(cl.BaseURL + method)
+	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("Content-Type", defaultContentType)
 	req.Header.SetMethod("POST")
 	byteBody, err := encodeClientRequest(method, args)
 	if err != nil {
