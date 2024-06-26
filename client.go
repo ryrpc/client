@@ -54,7 +54,7 @@ func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args
 		fctx.Request.Header.CopyTo(&req.Header)
 		req.Header.Set("func", name[1])
 	}
-	
+
 	req.SetRequestURI(cl.BaseURL + method)
 	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", defaultContentType)
@@ -84,16 +84,17 @@ func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args
 		}
 	}
 
-	fmt.Println("fctx.Request.Header.Len(): ", fctx.Request.Header.Len())
-	fctx.Request.Header.VisitAll(func(key, value []byte) {
-		fmt.Println("fctx.Request.Header key: ", string(key), " value: ", string(value))
-	})
+	/*
+		fmt.Println("fctx.Request.Header.Len(): ", fctx.Request.Header.Len())
+		fctx.Request.Header.VisitAll(func(key, value []byte) {
+			fmt.Println("fctx.Request.Header key: ", string(key), " value: ", string(value))
+		})
 
-	fmt.Println("req.Header.Len(): ", req.Header.Len())
-	req.Header.VisitAll(func(key, value []byte) {
-		fmt.Println("req.Header key: ", string(key), " value: ", string(value))
-	})
-	
+		fmt.Println("req.Header.Len(): ", req.Header.Len())
+		req.Header.VisitAll(func(key, value []byte) {
+			fmt.Println("req.Header key: ", string(key), " value: ", string(value))
+		})
+	*/
 	cl.clientPool.Put(cli)
 	statusCode := resp.StatusCode()
 	if statusCode != 200 {
