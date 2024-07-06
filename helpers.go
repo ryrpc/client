@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/fxamacker/cbor/v2"
-	"github.com/golang/protobuf/proto"
 )
 
 // func printObject(v interface{}) string {
@@ -32,16 +31,16 @@ func encodeClientRequest(method string, args interface{}) ([]byte, error) {
 // decodeClientResponse decodes the response body of a client request into the interface reply.
 func decodeClientResponse(method string, r []byte, result interface{}) error {
 
-	arg := &PBase{}
+	arg := &Base{}
 
-	err := proto.Unmarshal(r, arg)
+	_, err := arg.Unmarshal(r)
 	if err != nil {
 		return err
 	}
 
-	if len(arg.GetErr()) > 0 {
+	if len(arg.Err) > 0 {
 		//err1 := fmt.Errorf("rpc call %s on rpc error: %s", method, arg.GetErr())
-		return errors.New(arg.GetErr())
+		return errors.New(arg.Err)
 	}
 	/*
 		if !arg.Has("result") {
@@ -50,11 +49,11 @@ func decodeClientResponse(method string, r []byte, result interface{}) error {
 		}
 	*/
 	if vv, ok := result.(*string); ok {
-		*vv = string(arg.GetData())
+		*vv = string(arg.Data)
 	} else if vv, ok := result.(*[]byte); ok {
-		*vv = arg.GetData()
+		*vv = arg.Data
 	} else {
-		err = cbor.Unmarshal(arg.GetData(), result)
+		err = cbor.Unmarshal(arg.Data, result)
 		if err != nil {
 			err1 := fmt.Errorf("rpc call %s() on could not decode body to rpc Decode: %s", method, err.Error())
 			return err1
