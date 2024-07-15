@@ -48,12 +48,11 @@ func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args
 	name := strings.SplitN(method, "/", 5)
 	if len(name) > 1 {
 
-		if fctx != nil {
-			fctx.Request.Header.Del("Host")
-			fctx.Request.Header.Del("User-Agent")
-			fctx.Request.Header.Del("Content-Type")
-			fctx.Request.Header.CopyTo(&req.Header)
-		}
+		fctx.Request.Header.CopyTo(&req.Header)
+
+		req.Header.Del("Host")
+		req.Header.Del("User-Agent")
+		req.Header.Del("Content-Type")
 		req.Header.Set("func", name[1])
 	}
 
