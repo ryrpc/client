@@ -49,10 +49,11 @@ func (cl *Client) makeCallRequest(fctx *fasthttp.RequestCtx, method string, args
 	if len(name) > 1 {
 
 		fctx.Request.Header.CopyTo(&req.Header)
-
+		/*
 		req.Header.Del("Host")
 		req.Header.Del("User-Agent")
 		req.Header.Del("Content-Type")
+  		*/
 		req.Header.Set("func", name[1])
 	}
 
